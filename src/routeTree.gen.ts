@@ -16,16 +16,19 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedTimetableRouteImport } from './routes/_protected/timetable'
 import { Route as ProtectedTeachersRouteImport } from './routes/_protected/teachers'
 import { Route as ProtectedStudentsRouteImport } from './routes/_protected/students'
+import { Route as ProtectedStudentSessionsRouteImport } from './routes/_protected/student-sessions'
 import { Route as ProtectedProfileRouteImport } from './routes/_protected/profile'
 import { Route as ProtectedNewAnnouncementpageRouteImport } from './routes/_protected/new-announcementpage'
 import { Route as ProtectedGradesRouteImport } from './routes/_protected/grades'
 import { Route as ProtectedFeesRouteImport } from './routes/_protected/fees'
 import { Route as ProtectedExamsRouteImport } from './routes/_protected/exams'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
-import { Route as ProtectedClassesRouteImport } from './routes/_protected/classes'
 import { Route as ProtectedAttendanceRouteImport } from './routes/_protected/attendance'
 import { Route as ProtectedAnnouncementsRouteImport } from './routes/_protected/announcements'
 import { Route as ProtectedAddExamsRouteImport } from './routes/_protected/add-exams'
+import { Route as ProtectedAcademicStandardsRouteImport } from './routes/_protected/academic-standards'
+import { Route as ProtectedAcademicSessionsRouteImport } from './routes/_protected/academic-sessions'
+import { Route as ProtectedAcademicClassesRouteImport } from './routes/_protected/academic-classes'
 import { Route as ProtectedNewInvoicePageRouteImport } from './routes/_protected/NewInvoicePage'
 import { Route as GuestRegisterRouteImport } from './routes/_guest/register'
 import { Route as GuestLoginRouteImport } from './routes/_guest/login'
@@ -70,6 +73,12 @@ const ProtectedStudentsRoute = ProtectedStudentsRouteImport.update({
   path: '/students',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedStudentSessionsRoute =
+  ProtectedStudentSessionsRouteImport.update({
+    id: '/student-sessions',
+    path: '/student-sessions',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
 const ProtectedProfileRoute = ProtectedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -101,11 +110,6 @@ const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => ProtectedRoute,
 } as any)
-const ProtectedClassesRoute = ProtectedClassesRouteImport.update({
-  id: '/classes',
-  path: '/classes',
-  getParentRoute: () => ProtectedRoute,
-} as any)
 const ProtectedAttendanceRoute = ProtectedAttendanceRouteImport.update({
   id: '/attendance',
   path: '/attendance',
@@ -121,6 +125,24 @@ const ProtectedAddExamsRoute = ProtectedAddExamsRouteImport.update({
   path: '/add-exams',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedAcademicStandardsRoute =
+  ProtectedAcademicStandardsRouteImport.update({
+    id: '/academic-standards',
+    path: '/academic-standards',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedAcademicSessionsRoute =
+  ProtectedAcademicSessionsRouteImport.update({
+    id: '/academic-sessions',
+    path: '/academic-sessions',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedAcademicClassesRoute =
+  ProtectedAcademicClassesRouteImport.update({
+    id: '/academic-classes',
+    path: '/academic-classes',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
 const ProtectedNewInvoicePageRoute = ProtectedNewInvoicePageRouteImport.update({
   id: '/NewInvoicePage',
   path: '/NewInvoicePage',
@@ -184,16 +206,19 @@ export interface FileRoutesByFullPath {
   '/login': typeof GuestLoginRoute
   '/register': typeof GuestRegisterRoute
   '/NewInvoicePage': typeof ProtectedNewInvoicePageRoute
+  '/academic-classes': typeof ProtectedAcademicClassesRoute
+  '/academic-sessions': typeof ProtectedAcademicSessionsRoute
+  '/academic-standards': typeof ProtectedAcademicStandardsRoute
   '/add-exams': typeof ProtectedAddExamsRoute
   '/announcements': typeof ProtectedAnnouncementsRoute
   '/attendance': typeof ProtectedAttendanceRoute
-  '/classes': typeof ProtectedClassesRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/exams': typeof ProtectedExamsRoute
   '/fees': typeof ProtectedFeesRoute
   '/grades': typeof ProtectedGradesRoute
   '/new-announcementpage': typeof ProtectedNewAnnouncementpageRoute
   '/profile': typeof ProtectedProfileRoute
+  '/student-sessions': typeof ProtectedStudentSessionsRoute
   '/students': typeof ProtectedStudentsRoute
   '/teachers': typeof ProtectedTeachersRoute
   '/timetable': typeof ProtectedTimetableRoute
@@ -211,16 +236,19 @@ export interface FileRoutesByTo {
   '/login': typeof GuestLoginRoute
   '/register': typeof GuestRegisterRoute
   '/NewInvoicePage': typeof ProtectedNewInvoicePageRoute
+  '/academic-classes': typeof ProtectedAcademicClassesRoute
+  '/academic-sessions': typeof ProtectedAcademicSessionsRoute
+  '/academic-standards': typeof ProtectedAcademicStandardsRoute
   '/add-exams': typeof ProtectedAddExamsRoute
   '/announcements': typeof ProtectedAnnouncementsRoute
   '/attendance': typeof ProtectedAttendanceRoute
-  '/classes': typeof ProtectedClassesRoute
   '/dashboard': typeof ProtectedDashboardRoute
   '/exams': typeof ProtectedExamsRoute
   '/fees': typeof ProtectedFeesRoute
   '/grades': typeof ProtectedGradesRoute
   '/new-announcementpage': typeof ProtectedNewAnnouncementpageRoute
   '/profile': typeof ProtectedProfileRoute
+  '/student-sessions': typeof ProtectedStudentSessionsRoute
   '/students': typeof ProtectedStudentsRoute
   '/teachers': typeof ProtectedTeachersRoute
   '/timetable': typeof ProtectedTimetableRoute
@@ -241,16 +269,19 @@ export interface FileRoutesById {
   '/_guest/login': typeof GuestLoginRoute
   '/_guest/register': typeof GuestRegisterRoute
   '/_protected/NewInvoicePage': typeof ProtectedNewInvoicePageRoute
+  '/_protected/academic-classes': typeof ProtectedAcademicClassesRoute
+  '/_protected/academic-sessions': typeof ProtectedAcademicSessionsRoute
+  '/_protected/academic-standards': typeof ProtectedAcademicStandardsRoute
   '/_protected/add-exams': typeof ProtectedAddExamsRoute
   '/_protected/announcements': typeof ProtectedAnnouncementsRoute
   '/_protected/attendance': typeof ProtectedAttendanceRoute
-  '/_protected/classes': typeof ProtectedClassesRoute
   '/_protected/dashboard': typeof ProtectedDashboardRoute
   '/_protected/exams': typeof ProtectedExamsRoute
   '/_protected/fees': typeof ProtectedFeesRoute
   '/_protected/grades': typeof ProtectedGradesRoute
   '/_protected/new-announcementpage': typeof ProtectedNewAnnouncementpageRoute
   '/_protected/profile': typeof ProtectedProfileRoute
+  '/_protected/student-sessions': typeof ProtectedStudentSessionsRoute
   '/_protected/students': typeof ProtectedStudentsRoute
   '/_protected/teachers': typeof ProtectedTeachersRoute
   '/_protected/timetable': typeof ProtectedTimetableRoute
@@ -270,16 +301,19 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/NewInvoicePage'
+    | '/academic-classes'
+    | '/academic-sessions'
+    | '/academic-standards'
     | '/add-exams'
     | '/announcements'
     | '/attendance'
-    | '/classes'
     | '/dashboard'
     | '/exams'
     | '/fees'
     | '/grades'
     | '/new-announcementpage'
     | '/profile'
+    | '/student-sessions'
     | '/students'
     | '/teachers'
     | '/timetable'
@@ -297,16 +331,19 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/NewInvoicePage'
+    | '/academic-classes'
+    | '/academic-sessions'
+    | '/academic-standards'
     | '/add-exams'
     | '/announcements'
     | '/attendance'
-    | '/classes'
     | '/dashboard'
     | '/exams'
     | '/fees'
     | '/grades'
     | '/new-announcementpage'
     | '/profile'
+    | '/student-sessions'
     | '/students'
     | '/teachers'
     | '/timetable'
@@ -326,16 +363,19 @@ export interface FileRouteTypes {
     | '/_guest/login'
     | '/_guest/register'
     | '/_protected/NewInvoicePage'
+    | '/_protected/academic-classes'
+    | '/_protected/academic-sessions'
+    | '/_protected/academic-standards'
     | '/_protected/add-exams'
     | '/_protected/announcements'
     | '/_protected/attendance'
-    | '/_protected/classes'
     | '/_protected/dashboard'
     | '/_protected/exams'
     | '/_protected/fees'
     | '/_protected/grades'
     | '/_protected/new-announcementpage'
     | '/_protected/profile'
+    | '/_protected/student-sessions'
     | '/_protected/students'
     | '/_protected/teachers'
     | '/_protected/timetable'
@@ -403,6 +443,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedStudentsRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/student-sessions': {
+      id: '/_protected/student-sessions'
+      path: '/student-sessions'
+      fullPath: '/student-sessions'
+      preLoaderRoute: typeof ProtectedStudentSessionsRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/_protected/profile': {
       id: '/_protected/profile'
       path: '/profile'
@@ -445,13 +492,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedDashboardRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/_protected/classes': {
-      id: '/_protected/classes'
-      path: '/classes'
-      fullPath: '/classes'
-      preLoaderRoute: typeof ProtectedClassesRouteImport
-      parentRoute: typeof ProtectedRoute
-    }
     '/_protected/attendance': {
       id: '/_protected/attendance'
       path: '/attendance'
@@ -471,6 +511,27 @@ declare module '@tanstack/react-router' {
       path: '/add-exams'
       fullPath: '/add-exams'
       preLoaderRoute: typeof ProtectedAddExamsRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/academic-standards': {
+      id: '/_protected/academic-standards'
+      path: '/academic-standards'
+      fullPath: '/academic-standards'
+      preLoaderRoute: typeof ProtectedAcademicStandardsRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/academic-sessions': {
+      id: '/_protected/academic-sessions'
+      path: '/academic-sessions'
+      fullPath: '/academic-sessions'
+      preLoaderRoute: typeof ProtectedAcademicSessionsRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/academic-classes': {
+      id: '/_protected/academic-classes'
+      path: '/academic-classes'
+      fullPath: '/academic-classes'
+      preLoaderRoute: typeof ProtectedAcademicClassesRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/_protected/NewInvoicePage': {
@@ -566,16 +627,19 @@ const GuestRouteWithChildren = GuestRoute._addFileChildren(GuestRouteChildren)
 
 interface ProtectedRouteChildren {
   ProtectedNewInvoicePageRoute: typeof ProtectedNewInvoicePageRoute
+  ProtectedAcademicClassesRoute: typeof ProtectedAcademicClassesRoute
+  ProtectedAcademicSessionsRoute: typeof ProtectedAcademicSessionsRoute
+  ProtectedAcademicStandardsRoute: typeof ProtectedAcademicStandardsRoute
   ProtectedAddExamsRoute: typeof ProtectedAddExamsRoute
   ProtectedAnnouncementsRoute: typeof ProtectedAnnouncementsRoute
   ProtectedAttendanceRoute: typeof ProtectedAttendanceRoute
-  ProtectedClassesRoute: typeof ProtectedClassesRoute
   ProtectedDashboardRoute: typeof ProtectedDashboardRoute
   ProtectedExamsRoute: typeof ProtectedExamsRoute
   ProtectedFeesRoute: typeof ProtectedFeesRoute
   ProtectedGradesRoute: typeof ProtectedGradesRoute
   ProtectedNewAnnouncementpageRoute: typeof ProtectedNewAnnouncementpageRoute
   ProtectedProfileRoute: typeof ProtectedProfileRoute
+  ProtectedStudentSessionsRoute: typeof ProtectedStudentSessionsRoute
   ProtectedStudentsRoute: typeof ProtectedStudentsRoute
   ProtectedTeachersRoute: typeof ProtectedTeachersRoute
   ProtectedTimetableRoute: typeof ProtectedTimetableRoute
@@ -587,16 +651,19 @@ interface ProtectedRouteChildren {
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedNewInvoicePageRoute: ProtectedNewInvoicePageRoute,
+  ProtectedAcademicClassesRoute: ProtectedAcademicClassesRoute,
+  ProtectedAcademicSessionsRoute: ProtectedAcademicSessionsRoute,
+  ProtectedAcademicStandardsRoute: ProtectedAcademicStandardsRoute,
   ProtectedAddExamsRoute: ProtectedAddExamsRoute,
   ProtectedAnnouncementsRoute: ProtectedAnnouncementsRoute,
   ProtectedAttendanceRoute: ProtectedAttendanceRoute,
-  ProtectedClassesRoute: ProtectedClassesRoute,
   ProtectedDashboardRoute: ProtectedDashboardRoute,
   ProtectedExamsRoute: ProtectedExamsRoute,
   ProtectedFeesRoute: ProtectedFeesRoute,
   ProtectedGradesRoute: ProtectedGradesRoute,
   ProtectedNewAnnouncementpageRoute: ProtectedNewAnnouncementpageRoute,
   ProtectedProfileRoute: ProtectedProfileRoute,
+  ProtectedStudentSessionsRoute: ProtectedStudentSessionsRoute,
   ProtectedStudentsRoute: ProtectedStudentsRoute,
   ProtectedTeachersRoute: ProtectedTeachersRoute,
   ProtectedTimetableRoute: ProtectedTimetableRoute,

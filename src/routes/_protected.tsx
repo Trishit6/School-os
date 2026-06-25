@@ -4,7 +4,7 @@ import Topbar from '#/components/layout/topbar.tsx'
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: ({ context }) => {
-    if (!context?.auth) {
+    if (!context.auth) {
       return
     }
 
