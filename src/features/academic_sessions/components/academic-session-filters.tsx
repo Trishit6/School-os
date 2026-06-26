@@ -10,7 +10,7 @@ export default function AcademicSessionFilters({ search, setSearch }: Props) {
     <div className="flex items-center gap-3">
       <div
         className="
-          flex w-[320px]
+          flex w-[350px]
           items-center gap-2
           rounded-xl
           border border-slate-200
@@ -21,6 +21,7 @@ export default function AcademicSessionFilters({ search, setSearch }: Props) {
         <FiSearch className="text-slate-400" />
 
         <input
+          type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search session..."
