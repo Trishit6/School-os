@@ -1,44 +1,24 @@
 export interface Student {
-  id: string;
+  id: number;
 
-  admissionNo: string;
-
-  firstName: string;
-  lastName: string;
-
-  email: string;
-  phone: string;
-
-  gender: string;
-
-  guardianName: string;
-  guardianPhone: string;
+  name: string;
 
   dateOfBirth: string;
-  address: string;
 
-  status: string;
+  guardianName: string;
+
+  status: boolean;
 
   createdAt?: string;
   updatedAt?: string;
 }
 
 export interface StudentFormData {
-  admissionNo: string;
-
-  firstName: string;
-  lastName: string;
-
-  email: string;
-  phone: string;
-
-  gender: string;
-
-  guardianName: string;
-  guardianPhone: string;
+  name: string;
 
   dateOfBirth: string;
-  address: string;
 
-  status: string;
+  guardianName: string;
+
+  status: boolean;
 }
