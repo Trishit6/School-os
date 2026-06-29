@@ -1,105 +1,119 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react";
 
-import AcademicClassService from "../services/academic-class-service"
 
 import type {
   AcademicClass,
   AcademicClassFormData,
-  AcademicSessionOption,
   AcademicStandardOption,
-} from "../types"
+} from "../types";
+import academicClassService from "../services/academic-class-service";
 
 export function useAcademicClasses() {
-  const [academicClasses, setAcademicClasses] = useState<AcademicClass[]>([])
-  const [academicSessions, setAcademicSessions] = useState<
-    AcademicSessionOption[]
-  >([])
+  const [academicClasses, setAcademicClasses] = useState<
+    AcademicClass[]
+  >([]);
+
   const [academicStandards, setAcademicStandards] = useState<
     AcademicStandardOption[]
-  >([])
+  >([]);
 
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true);
 
-  const loadAcademicClasses = async () => {
+  const [saving, setSaving] = useState(false);
+
+  const loadAcademicClasses = useCallback(async () => {
     try {
-      setLoading(true)
+      setLoading(true);
 
-      const [classes, sessions, standards] = await Promise.all([
-        AcademicClassService.getAll(),
-        AcademicClassService.getAcademicSessions(),
-        AcademicClassService.getAcademicStandards(),
-      ])
+      const [classes, standards] = await Promise.all([
+        academicClassService.getAll(),
+        academicClassService.getAcademicStandards(),
+      ]);
 
-      setAcademicClasses(classes)
-      setAcademicSessions(sessions)
-      setAcademicStandards(standards)
+      setAcademicClasses(classes);
+      setAcademicStandards(standards);
     } catch (error) {
-      console.error(error)
+      console.error("Failed to load academic classes", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
-    void loadAcademicClasses()
-  }, [])
+    void loadAcademicClasses();
+  }, [loadAcademicClasses]);
 
-  const create = async (values: AcademicClassFormData) => {
+  const create = async (
+    values: AcademicClassFormData,
+  ) => {
     try {
-      setSaving(true)
+      setSaving(true);
 
-      const academicClass = await AcademicClassService.create(values)
+      const academicClass =
+        await academicClassService.create(values);
 
-      setAcademicClasses((prev) => [academicClass, ...prev])
+      setAcademicClasses((prev) => [
+        academicClass,
+        ...prev,
+      ]);
+    } catch (error) {
+      console.error("Create failed", error);
+      throw error;
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   const update = async (
     id: number,
     values: AcademicClassFormData,
   ) => {
     try {
-      setSaving(true)
+      setSaving(true);
 
-      const academicClass = await AcademicClassService.update(
-        id,
-        values,
-      )
+      const academicClass =
+        await academicClassService.update(
+          id,
+          values,
+        );
 
       setAcademicClasses((prev) =>
         prev.map((item) =>
           item.id === id ? academicClass : item,
         ),
-      )
+      );
+    } catch (error) {
+      console.error("Update failed", error);
+      throw error;
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   const remove = async (id: number) => {
     try {
-      await AcademicClassService.delete(id)
+      await academicClassService.delete(id);
 
       setAcademicClasses((prev) =>
         prev.filter((item) => item.id !== id),
-      )
+      );
     } catch (error) {
-      console.error(error)
+      console.error("Delete failed", error);
+      throw error;
     }
-  }
+  };
 
   return {
     academicClasses,
-    academicSessions,
     academicStandards,
+
     loading,
     saving,
+
     create,
     update,
     remove,
+
     reload: loadAcademicClasses,
-  }
+  };
 }

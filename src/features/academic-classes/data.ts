@@ -1,8 +1,8 @@
-import api from "#/lib/api.ts";
+import api from "#/lib/api.ts"
+
 import type {
   AcademicClass,
   AcademicClassFormData,
-  AcademicSessionOption,
   AcademicStandardOption,
 } from "./types"
 
@@ -12,12 +12,10 @@ interface ApiResponse<T> {
   data: T
 }
 
-
 export async function getAcademicClasses(): Promise<AcademicClass[]> {
-  const response =
-    await api.get<ApiResponse<AcademicClass[]>>(
-      "/academic_classes"
-    )
+  const response = await api.get<ApiResponse<AcademicClass[]>>(
+    "/academic_classes",
+  )
 
   return response.data.data
 }
@@ -25,10 +23,9 @@ export async function getAcademicClasses(): Promise<AcademicClass[]> {
 export async function getAcademicClass(
   id: number,
 ): Promise<AcademicClass> {
-  const response =
-    await api.get<ApiResponse<AcademicClass>>(
-      `/academic_classes/${id}`,
-    )
+  const response = await api.get<ApiResponse<AcademicClass>>(
+    `/academic_classes/${id}`,
+  )
 
   return response.data.data
 }
@@ -36,11 +33,10 @@ export async function getAcademicClass(
 export async function createAcademicClass(
   payload: AcademicClassFormData,
 ): Promise<AcademicClass> {
-  const response =
-    await api.post<ApiResponse<AcademicClass>>(
-      "/academic_classes",
-      payload,
-    )
+  const response = await api.post<ApiResponse<AcademicClass>>(
+    "/academic_classes",
+    payload,
+  )
 
   return response.data.data
 }
@@ -49,11 +45,10 @@ export async function updateAcademicClass(
   id: number,
   payload: AcademicClassFormData,
 ): Promise<AcademicClass> {
-  const response =
-    await api.put<ApiResponse<AcademicClass>>(
-      `/academic_classes/${id}`,
-      payload,
-    )
+  const response = await api.put<ApiResponse<AcademicClass>>(
+    `/academic_classes/${id}`,
+    payload,
+  )
 
   return response.data.data
 }
@@ -64,25 +59,12 @@ export async function deleteAcademicClass(
   await api.delete(`/academic_classes/${id}`)
 }
 
-
-export async function getAcademicSessions(): Promise<
-  AcademicSessionOption[]
-> {
-  const response =
-    await api.get<ApiResponse<AcademicSessionOption[]>>(
-      "/academic_sessions",
-    )
-
-  return response.data.data
-}
-
 export async function getAcademicStandards(): Promise<
   AcademicStandardOption[]
 > {
-  const response =
-    await api.get<ApiResponse<AcademicStandardOption[]>>(
-      "/academic_standards",
-    )
+  const response = await api.get<
+    ApiResponse<AcademicStandardOption[]>
+  >("/academic_standards")
 
   return response.data.data
 }

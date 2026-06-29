@@ -1,10 +1,16 @@
-import { FiPlus } from 'react-icons/fi'
+import type { ReactNode } from 'react'
 
 interface Props {
-  onCreate: () => void
+  title: string
+  description: string
+  children?: ReactNode
 }
 
-export default function AcademicClassHeader({ onCreate }: Props) {
+export default function AcademicClassHeader({
+  title,
+  description,
+  children,
+}: Props) {
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div>
@@ -12,20 +18,12 @@ export default function AcademicClassHeader({ onCreate }: Props) {
           Academic Management
         </span>
 
-        <h1 className="mt-3 text-3xl font-bold">Academic Classes</h1>
+        <h1 className="mt-3 text-3xl font-bold">{title}</h1>
 
-        <p className="mt-2 text-slate-500 dark:text-slate-400">
-          Manage academic classes, capacities, standards and academic sessions.
-        </p>
+        <p className="mt-2 text-slate-500 dark:text-slate-400">{description}</p>
       </div>
 
-      <button
-        onClick={onCreate}
-        className="flex items-center gap-2 rounded-xl bg-cyan-600 px-5 py-3 font-medium text-white transition hover:bg-cyan-700"
-      >
-        <FiPlus />
-        Add Academic Class
-      </button>
+      {children}
     </div>
   )
 }

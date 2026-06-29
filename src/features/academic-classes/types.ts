@@ -1,8 +1,3 @@
-export interface AcademicSessionOption {
-  id: number
-  name: string
-}
-
 export interface AcademicStandardOption {
   id: number
   name: string
@@ -11,17 +6,15 @@ export interface AcademicStandardOption {
 export interface AcademicClass {
   id: number
 
-  academicSessionId: number
-
-  academicStandardId: number
-
   name: string
+
+  code: string
 
   capacity: number
 
   status: boolean
 
-  academicSession: AcademicSessionOption
+  academicStandardId: number
 
   academicStandard: AcademicStandardOption
 
@@ -31,11 +24,11 @@ export interface AcademicClass {
 }
 
 export interface AcademicClassFormData {
-  academic_session_id: number
+  name: string
+
+  code: string
 
   academic_standard_id: number
-
-  name: string
 
   capacity: number
 
