@@ -1,40 +1,40 @@
-export interface StudentSession {
-  id: number;
-
-  studentId: number;
-  academicSessionId: number;
-  academicClassId: number;
-
-  rollNo: string;
-
-  status: string;
-
-  student?: {
-    id: number;
-    admissionNo: string;
-    name: string;
-  };
-
-  academicSession?: {
-    id: number;
-    name: string;
-  };
-
-  academicClass?: {
-    id: number;
-    name: string;
-  };
-
-  createdAt?: string;
-  updatedAt?: string;
+export type StudentSessionPayload = {
+  student_id: number
+  academic_session_id: number
+  academic_class_id: number
+  roll_no: number
+  status: boolean
 }
 
-export interface StudentSessionFormData {
-  studentId: number;
-  academicSessionId: number;
-  academicClassId: number;
+export type StudentSession = {
+  id: number
 
-  rollNo: string;
+  studentId: number
+  academicSessionId: number
+  academicClassId: number
+  rollNo: number
+  status: boolean
 
-  status: string;
+  createdAt?: string
+  updatedAt?: string
+
+  student?: {
+    id: number
+    name: string
+  }
+
+  academicSession?: {
+    id: number
+    name: string
+  }
+
+  academicClass?: {
+    id: number
+    name: string
+    code?: string
+    academicStandard?: {
+      id: number
+      name: string
+    }
+  }
 }

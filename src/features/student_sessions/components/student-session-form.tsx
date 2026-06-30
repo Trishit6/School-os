@@ -1,36 +1,40 @@
 import { FiX } from 'react-icons/fi'
+import { useForm, useStore } from '@tanstack/react-form'
+import { useEffect, useMemo, useState } from 'react'
 
+import type { StudentSession } from '../types'
 import {
   studentSessionSchema,
   type StudentSessionSchema,
 } from '../schemas/student-session.schema'
 
-import type { StudentSession } from '../types'
-import { useForm } from '@tanstack/react-form'
-import { zodResolver } from 'hookform/resolvers/zod'
+type StudentOption = { id: number; name: string }
+type SessionOption = { id: number; name: string }
 
-type Option = {
+type StandardOption = {
   id: number
   name: string
+  academicSessionId?: number
+  academic_session_id?: number
+}
+
+type ClassOption = {
+  id: number
+  name: string
+  academicSessionId?: number
+  academic_session_id?: number
+  academicStandardId?: number
+  academic_standard_id?: number
 }
 
 type Props = {
   session?: StudentSession
-
-  students: {
-    id: number
-    admissionNo: string
-    name: string
-  }[]
-
-  academicSessions: Option[]
-
-  academicClasses: Option[]
-
+  students: StudentOption[]
+  academicSessions: SessionOption[]
+  academicStandards: StandardOption[]
+  academicClasses: ClassOption[]
   onClose: () => void
-
-  onSubmit: (data: StudentSessionSchema) => void
-
+  onSubmit: (data: StudentSessionSchema) => void | Promise<void>
   loading?: boolean
 }
 
@@ -38,162 +42,261 @@ export default function StudentSessionForm({
   session,
   students,
   academicSessions,
+  academicStandards = [],
   academicClasses,
   onClose,
   onSubmit,
   loading = false,
 }: Props) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<StudentSessionSchema>({
-    resolver: zodResolver(studentSessionSchema),
-
+  const form = useForm({
     defaultValues: {
-      studentId: session?.studentId ?? undefined,
+      studentId: session?.studentId ?? 0,
+      academicSessionId: session?.academicSessionId ?? 0,
+      academicClassId: session?.academicClassId ?? 0,
+      rollNo: session?.rollNo ?? 0,
+      status: session?.status ?? true,
+    } satisfies StudentSessionSchema,
 
-      academicSessionId: session?.academicSessionId ?? undefined,
-
-      academicClassId: session?.academicClassId ?? undefined,
-
-      rollNo: session?.rollNo ?? '',
-
-      status: session?.status ?? 'ACTIVE',
+    onSubmit: async ({ value }) => {
+      const parsed = studentSessionSchema.safeParse(value)
+      if (!parsed.success) {
+        console.error(parsed.error.flatten())
+        return
+      }
+      await onSubmit(parsed.data)
     },
   })
 
+  // 🔥 form state watcher
+  const academicSessionId = useStore(
+    form.store,
+    (s) => s.values.academicSessionId,
+  )
+
+  // 🔥 local filter state
+  const [selectedStandardId, setSelectedStandardId] = useState<number>(0)
+
+  // ✅ FIX: reset standard when editing different session
+  useEffect(() => {
+    if (!session) {
+      setSelectedStandardId(0)
+      return
+    }
+
+    const matchedClass = academicClasses.find(
+      (c) => c.id === session.academicClassId,
+    )
+
+    setSelectedStandardId(
+      matchedClass?.academicStandardId ??
+        matchedClass?.academic_standard_id ??
+        0,
+    )
+  }, [session, academicClasses])
+
+  // 🔥 standards filter
+  const filteredStandards = useMemo(() => {
+    if (!academicSessionId) return []
+
+    return academicStandards.filter((s) => {
+      const ref = s.academicSessionId ?? s.academic_session_id
+      return Number(ref) === Number(academicSessionId)
+    })
+  }, [academicStandards, academicSessionId])
+
+  // 🔥 classes filter
+  const filteredClasses = useMemo(() => {
+    if (!academicSessionId) return []
+
+    return academicClasses.filter((c) => {
+      const sessionRef = c.academicSessionId ?? c.academic_session_id
+      const standardRef = c.academicStandardId ?? c.academic_standard_id
+
+      return (
+        Number(sessionRef) === Number(academicSessionId) &&
+        (selectedStandardId === 0 ||
+          Number(standardRef) === Number(selectedStandardId))
+      )
+    })
+  }, [academicClasses, academicSessionId, selectedStandardId])
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-3xl rounded-3xl bg-white shadow-2xl">
+      <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl">
         {/* HEADER */}
-        <div className="flex items-center justify-between border-b px-6 py-5">
+        <div className="flex items-center justify-between border-b px-5 py-4">
           <div>
-            <h2 className="text-2xl font-bold">
-              {session ? 'Edit Student Session' : 'Assign Student'}
+            <h2 className="text-lg font-bold text-slate-900">
+              {session ? 'Edit Student Session' : 'Assign Student Session'}
             </h2>
-
-            <p className="text-sm text-slate-500">
-              Manage academic session assignment
+            <p className="text-xs text-slate-500">
+              Manage academic assignments
             </p>
           </div>
 
           <button
             onClick={onClose}
-            className="rounded-xl p-2 hover:bg-slate-100"
+            className="rounded-lg p-2 hover:bg-slate-100"
           >
             <FiX />
           </button>
         </div>
 
-        {/* BODY */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 p-6">
-          {/* STUDENT */}
-          <div>
-            <label className="mb-2 block text-sm font-medium">Student</label>
+        {/* FORM */}
+        <form
+          className="p-5 space-y-5"
+          onSubmit={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            form.handleSubmit()
+          }}
+        >
+          {/* ROW 1 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Student */}
+            <form.Field name="studentId">
+              {(field) => (
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">
+                    Student
+                  </label>
+                  <select
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    className="w-full mt-1 rounded-xl border px-3 py-2"
+                  >
+                    <option value={0}>Select Student</option>
+                    {students.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </form.Field>
 
-            <select
-              {...register('studentId')}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3"
-            >
-              <option value="">Select Student</option>
-
-              {students.map((student) => (
-                <option key={student.id} value={student.id}>
-                  {student.name} ({student.admissionNo})
-                </option>
-              ))}
-            </select>
-
-            <p className="mt-1 text-xs text-red-500">
-              {errors.studentId?.message}
-            </p>
+            {/* Session */}
+            <form.Field name="academicSessionId">
+              {(field) => (
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">
+                    Academic Session
+                  </label>
+                  <select
+                    value={field.state.value}
+                    onChange={(e) => {
+                      field.handleChange(Number(e.target.value))
+                      setSelectedStandardId(0)
+                      form.setFieldValue('academicClassId', 0)
+                    }}
+                    className="w-full mt-1 rounded-xl border px-3 py-2"
+                  >
+                    <option value={0}>Select Session</option>
+                    {academicSessions.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </form.Field>
           </div>
 
-          {/* SESSION */}
-          <div>
-            <label className="mb-2 block text-sm font-medium">
-              Academic Session
-            </label>
+          {/* ROW 2 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Standard */}
+            <div>
+              <label className="text-xs font-semibold text-slate-600">
+                Academic Standard
+              </label>
+              <select
+                value={selectedStandardId}
+                onChange={(e) => {
+                  setSelectedStandardId(Number(e.target.value))
+                  form.setFieldValue('academicClassId', 0)
+                }}
+                className="w-full mt-1 rounded-xl border px-3 py-2"
+              >
+                <option value={0}>All Standards</option>
+                {filteredStandards.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <select
-              {...register('academicSessionId')}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3"
-            >
-              <option value="">Select Session</option>
-
-              {academicSessions.map((session) => (
-                <option key={session.id} value={session.id}>
-                  {session.name}
-                </option>
-              ))}
-            </select>
-
-            <p className="mt-1 text-xs text-red-500">
-              {errors.academicSessionId?.message}
-            </p>
+            {/* Class */}
+            <form.Field name="academicClassId">
+              {(field) => (
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">
+                    Academic Class
+                  </label>
+                  <select
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    className="w-full mt-1 rounded-xl border px-3 py-2"
+                  >
+                    <option value={0}>Select Class</option>
+                    {filteredClasses.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </form.Field>
           </div>
 
-          {/* CLASS */}
-          <div>
-            <label className="mb-2 block text-sm font-medium">
-              Academic Class
-            </label>
+          {/* ROW 3 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Roll No */}
+            <form.Field name="rollNo">
+              {(field) => (
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">
+                    Roll Number
+                  </label>
+                  <input
+                    type="number"
+                    value={field.state.value || ''}
+                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    className="w-full mt-1 rounded-xl border px-3 py-2"
+                  />
+                </div>
+              )}
+            </form.Field>
 
-            <select
-              {...register('academicClassId')}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3"
-            >
-              <option value="">Select Class</option>
-
-              {academicClasses.map((academicClass) => (
-                <option key={academicClass.id} value={academicClass.id}>
-                  {academicClass.name}
-                </option>
-              ))}
-            </select>
-
-            <p className="mt-1 text-xs text-red-500">
-              {errors.academicClassId?.message}
-            </p>
-          </div>
-
-          {/* ROLL NO */}
-          <div>
-            <label className="mb-2 block text-sm font-medium">
-              Roll Number
-            </label>
-
-            <input
-              {...register('rollNo')}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3"
-            />
-
-            <p className="mt-1 text-xs text-red-500">
-              {errors.rollNo?.message}
-            </p>
-          </div>
-
-          {/* STATUS */}
-          <div>
-            <label className="mb-2 block text-sm font-medium">Status</label>
-
-            <select
-              {...register('status')}
-              className="w-full rounded-xl border border-slate-300 px-4 py-3"
-            >
-              <option value="ACTIVE">ACTIVE</option>
-
-              <option value="INACTIVE">INACTIVE</option>
-            </select>
+            {/* Status */}
+            <form.Field name="status">
+              {(field) => (
+                <div>
+                  <label className="text-xs font-semibold text-slate-600">
+                    Status
+                  </label>
+                  <select
+                    value={field.state.value ? '1' : '0'}
+                    onChange={(e) => field.handleChange(e.target.value === '1')}
+                    className="w-full mt-1 rounded-xl border px-3 py-2"
+                  >
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                  </select>
+                </div>
+              )}
+            </form.Field>
           </div>
 
           {/* FOOTER */}
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex justify-end gap-3 pt-4 border-t">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border px-5 py-3"
+              className="px-4 py-2 rounded-xl border"
             >
               Cancel
             </button>
@@ -201,7 +304,7 @@ export default function StudentSessionForm({
             <button
               type="submit"
               disabled={loading}
-              className="rounded-xl bg-cyan-600 px-5 py-3 text-white"
+              className="px-4 py-2 rounded-xl bg-cyan-600 text-white"
             >
               {loading ? 'Saving...' : 'Save'}
             </button>

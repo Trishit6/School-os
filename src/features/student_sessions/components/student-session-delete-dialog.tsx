@@ -3,7 +3,6 @@ import { FiAlertTriangle } from 'react-icons/fi'
 type Props = {
   open: boolean
   loading?: boolean
-
   onClose: () => void
   onConfirm: () => void
 }
@@ -26,7 +25,6 @@ export default function StudentSessionDeleteDialog({
 
           <div>
             <h3 className="text-lg font-bold">Delete Student Session</h3>
-
             <p className="text-sm text-slate-500">
               This action cannot be undone.
             </p>
@@ -34,14 +32,14 @@ export default function StudentSessionDeleteDialog({
         </div>
 
         <p className="mt-5 text-sm text-slate-600">
-          Are you sure you want to remove this student session assignment?
+          Are you sure you want to remove this assignment?
         </p>
 
         <div className="mt-6 flex justify-end gap-3">
           <button
             onClick={onClose}
             disabled={loading}
-            className="rounded-xl border border-slate-300 px-5 py-2.5"
+            className="rounded-xl border px-5 py-2.5"
           >
             Cancel
           </button>
@@ -49,7 +47,7 @@ export default function StudentSessionDeleteDialog({
           <button
             onClick={onConfirm}
             disabled={loading}
-            className="rounded-xl bg-red-600 px-5 py-2.5 text-white hover:bg-red-700"
+            className="rounded-xl bg-red-600 px-5 py-2.5 text-white"
           >
             {loading ? 'Deleting...' : 'Delete'}
           </button>

@@ -1,3 +1,5 @@
+import type { StudentSession } from "#/features/student_sessions/types";
+
 export interface Student {
   id: number;
 
@@ -9,7 +11,10 @@ export interface Student {
 
   status: boolean;
 
+  studentSessions?: StudentSession[];
+
   createdAt?: string;
+
   updatedAt?: string;
 }
 

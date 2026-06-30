@@ -22,14 +22,18 @@ export default function StudentSessionHeader({ onAdd }: Props) {
       </div>
 
       <div className="flex gap-3">
-        <button className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2">
+        <button
+          type="button"
+          className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2"
+        >
           <FiDownload />
           Export
         </button>
 
         <button
+          type="button"
           onClick={onAdd}
-          className="flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-2 text-white"
+          className="flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-2 text-white hover:bg-cyan-700"
         >
           <FiPlus />
           Assign Student

@@ -1,10 +1,16 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { FiDownload, FiPlus, FiSearch } from 'react-icons/fi'
 
 import StudentForm from './components/student-form'
 import StudentTable from './components/student-table'
+import StudentProfileModal from './components/student-profile-modal'
 
-import { useStudents } from './hooks/use-students'
+import {
+  useStudents,
+  useCreateStudent,
+  useUpdateStudent,
+  useDeleteStudent,
+} from './hooks/use-students'
 
 import type { Student, StudentFormData } from './types'
 
@@ -15,39 +21,67 @@ export default function StudentsComponent() {
 
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
 
+  const [profileStudent, setProfileStudent] = useState<Student | null>(null)
+
   const { data: students = [], isLoading } = useStudents()
 
-  const filteredStudents = students.filter(
-    (student) =>
-      student.name.toLowerCase().includes(search.toLowerCase()) ||
-      student.guardianName.toLowerCase().includes(search.toLowerCase()),
-  )
+  const createMutation = useCreateStudent()
 
-  const handleCreate = (data: StudentFormData) => {
-    console.log('Create', data)
+  const updateMutation = useUpdateStudent()
 
-    setShowForm(false)
+  const deleteMutation = useDeleteStudent()
+
+  const filteredStudents = useMemo(() => {
+    return students.filter(
+      (student) =>
+        student.name.toLowerCase().includes(search.toLowerCase()) ||
+        student.guardianName.toLowerCase().includes(search.toLowerCase()),
+    )
+  }, [students, search])
+
+  async function handleCreate(data: StudentFormData) {
+    try {
+      await createMutation.mutateAsync(data)
+
+      setShowForm(false)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
-  const handleEdit = (data: StudentFormData) => {
-    console.log('Update', selectedStudent?.id, data)
+  async function handleEdit(data: StudentFormData) {
+    if (!selectedStudent) return
 
-    setShowForm(false)
+    try {
+      await updateMutation.mutateAsync({
+        id: selectedStudent.id,
+        data,
+      })
 
-    setSelectedStudent(null)
+      setSelectedStudent(null)
+
+      setShowForm(false)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
-  const handleDelete = (student: Student) => {
-    console.log('Delete', student.id)
+  async function handleDelete(student: Student) {
+    if (!window.confirm('Delete this student?')) return
+
+    try {
+      await deleteMutation.mutateAsync(student.id)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
-  const handleView = (student: Student) => {
-    console.log(student)
+  function handleView(student: Student) {
+    setProfileStudent(student)
   }
 
   return (
     <div className="space-y-6">
-      {/* HEADER */}
       <div className="flex items-start justify-between">
         <div>
           <span className="rounded-full bg-cyan-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-cyan-700">
@@ -56,9 +90,7 @@ export default function StudentsComponent() {
 
           <h1 className="mt-3 text-4xl font-bold text-slate-900">Students</h1>
 
-          <p className="mt-2 text-sm text-slate-500">
-            Manage student records and guardians.
-          </p>
+          <p className="mt-2 text-sm text-slate-500">Manage student records.</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -72,7 +104,7 @@ export default function StudentsComponent() {
               setSelectedStudent(null)
               setShowForm(true)
             }}
-            className="flex items-center gap-2 rounded-xl bg-[#0b8ca1] px-4 py-2 text-sm font-semibold text-white"
+            className="flex items-center gap-2 rounded-xl bg-cyan-600 px-4 py-2 text-sm font-semibold text-white hover:bg-cyan-700"
           >
             <FiPlus />
             Add Student
@@ -80,22 +112,20 @@ export default function StudentsComponent() {
         </div>
       </div>
 
-      {/* SEARCH */}
       <div className="flex w-[350px] items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
         <FiSearch className="text-slate-400" />
 
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search student or guardian"
+          placeholder="Search student..."
           className="w-full bg-transparent text-sm outline-none"
         />
       </div>
 
-      {/* TABLE */}
       {isLoading ? (
         <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center">
-          Loading students...
+          Loading...
         </div>
       ) : (
         <StudentTable
@@ -109,7 +139,6 @@ export default function StudentsComponent() {
         />
       )}
 
-      {/* FORM */}
       {showForm && (
         <StudentForm
           student={selectedStudent}
@@ -118,6 +147,13 @@ export default function StudentsComponent() {
             setSelectedStudent(null)
           }}
           onSubmit={selectedStudent ? handleEdit : handleCreate}
+        />
+      )}
+
+      {profileStudent && (
+        <StudentProfileModal
+          student={profileStudent}
+          onClose={() => setProfileStudent(null)}
         />
       )}
     </div>

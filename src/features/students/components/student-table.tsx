@@ -1,4 +1,4 @@
-import { FiEdit, FiEye, FiTrash } from 'react-icons/fi'
+import { FiEdit2, FiEye, FiTrash2 } from 'react-icons/fi'
 import type { Student } from '../types'
 
 type Props = {
@@ -14,70 +14,121 @@ export default function StudentTable({
   onEdit,
   onDelete,
 }: Props) {
-  return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-      <div className="grid grid-cols-6 border-b border-slate-200 bg-slate-50 px-6 py-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
-        <div>ID</div>
-        <div>Name</div>
-        <div>Date Of Birth</div>
-        <div>Guardian</div>
-        <div>Status</div>
-        <div>Actions</div>
+  if (!students.length) {
+    return (
+      <div className="rounded-2xl border bg-white p-10 text-center text-slate-500 shadow-sm">
+        No students found.
       </div>
+    )
+  }
 
-      {students.map((student) => (
-        <div
-          key={student.id}
-          className="grid grid-cols-6 items-center border-b border-slate-100 px-6 py-4 hover:bg-slate-50"
-        >
-          <div className="font-medium">{student.id}</div>
+  return (
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-slate-50">
+            <tr>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
+                ID
+              </th>
 
-          <div>{student.name}</div>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
+                Student
+              </th>
 
-          <div>{student.dateOfBirth}</div>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
+                Date Of Birth
+              </th>
 
-          <div>{student.guardianName}</div>
+              <th className="px-6 py-4 text-left text-sm font-semibold text-slate-700">
+                Guardian
+              </th>
 
-          <div>
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                student.status
-                  ? 'bg-cyan-100 text-cyan-700'
-                  : 'bg-red-100 text-red-700'
-              }`}
-            >
-              {student.status ? 'ACTIVE' : 'INACTIVE'}
-            </span>
-          </div>
+              <th className="px-6 py-4 text-center text-sm font-semibold text-slate-700">
+                Status
+              </th>
 
-          <div className="flex gap-2">
-            <button
-              onClick={() => onView(student)}
-              className="rounded-lg p-2 hover:bg-slate-100"
-            >
-              <FiEye />
-            </button>
+              <th className="px-6 py-4 text-center text-sm font-semibold text-slate-700">
+                Actions
+              </th>
+            </tr>
+          </thead>
 
-            <button
-              onClick={() => onEdit(student)}
-              className="rounded-lg p-2 hover:bg-slate-100"
-            >
-              <FiEdit />
-            </button>
+          <tbody>
+            {students.map((student) => (
+              <tr
+                key={student.id}
+                className="border-t border-slate-100 hover:bg-slate-50"
+              >
+                <td className="px-6 py-4 font-semibold text-slate-700">
+                  {student.id}
+                </td>
 
-            <button
-              onClick={() => onDelete(student)}
-              className="rounded-lg p-2 text-red-500 hover:bg-red-50"
-            >
-              <FiTrash />
-            </button>
-          </div>
-        </div>
-      ))}
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-cyan-100 font-bold text-cyan-700">
+                      {student.name.charAt(0).toUpperCase()}
+                    </div>
 
-      {students.length === 0 && (
-        <div className="p-10 text-center text-slate-500">No students found</div>
-      )}
+                    <div>
+                      <p className="font-semibold text-slate-800">
+                        {student.name}
+                      </p>
+
+                      <p className="text-xs text-slate-500">Student</p>
+                    </div>
+                  </div>
+                </td>
+
+                <td className="px-6 py-4 text-slate-600">
+                  {student.dateOfBirth}
+                </td>
+
+                <td className="px-6 py-4 text-slate-600">
+                  {student.guardianName}
+                </td>
+
+                <td className="px-6 py-4 text-center">
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      student.status
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}
+                  >
+                    {student.status ? 'Active' : 'Inactive'}
+                  </span>
+                </td>
+
+                <td className="px-6 py-4">
+                  <div className="flex justify-center gap-2">
+                    <button
+                      onClick={() => onView(student)}
+                      className="rounded-lg p-2 text-cyan-600 transition hover:bg-cyan-100"
+                    >
+                      <FiEye size={18} />
+                    </button>
+
+                    <button
+                      onClick={() => onEdit(student)}
+                      className="rounded-lg p-2 text-amber-600 transition hover:bg-amber-100"
+                    >
+                      <FiEdit2 size={18} />
+                    </button>
+
+                    <button
+                      onClick={() => onDelete(student)}
+                      className="rounded-lg p-2 text-red-600 transition hover:bg-red-100"
+                    >
+                      <FiTrash2 size={18} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
