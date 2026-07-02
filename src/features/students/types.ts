@@ -1,29 +1,19 @@
-import type { StudentSession } from "#/features/student_sessions/types";
+import type { StudentSession } from '../student_sessions/types'
 
-export interface Student {
-  id: number;
-
-  name: string;
-
-  dateOfBirth: string;
-
-  guardianName: string;
-
-  status: boolean;
-
-  studentSessions?: StudentSession[];
-
-  createdAt?: string;
-
-  updatedAt?: string;
+export type Student = {
+  id: number
+  name: string
+  dateOfBirth: string
+  guardianName: string
+  status: boolean
+  photo?: string | null
+  studentSessions?: StudentSession[]
 }
 
-export interface StudentFormData {
-  name: string;
-
-  dateOfBirth: string;
-
-  guardianName: string;
-
-  status: boolean;
+export type StudentFormData = {
+  name: string
+  dateOfBirth: string
+  guardianName: string
+  status: boolean
+  photo?: string | null
 }

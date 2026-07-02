@@ -3,7 +3,7 @@ import { getStudentSessions } from '../services/student-session-service'
 
 export function useStudentSessions() {
   return useQuery({
-    queryKey: ['student-sessions'],
+    queryKey: ['student_sessions'],
     queryFn: async () => {
       try {
         const res = await getStudentSessions()

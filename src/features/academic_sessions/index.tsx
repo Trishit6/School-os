@@ -1,151 +1,172 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-
-import api from '@/lib/api'
+import { FiBookOpen, FiSearch, FiUsers } from 'react-icons/fi'
 
 import AcademicSessionHeader from './components/academic-session-header'
 import AcademicSessionFilters from './components/academic-session-filters'
 import AcademicSessionTable from './components/academic-session-table'
 import AcademicSessionForm from './components/academic-session-form'
 
-import type { AcademicSession } from './types'
+import type { AcademicSession, AcademicSessionPayload } from './types'
+import { academicSessionService } from './data/services'
+
+function StatCard({
+  title,
+  value,
+  icon,
+}: {
+  title: string
+  value: string | number
+  icon: React.ReactNode
+}) {
+  return (
+    <div className="rounded-[26px] border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+            {title}
+          </p>
+          <p className="mt-3 text-2xl font-bold tracking-tight text-slate-900">
+            {value}
+          </p>
+        </div>
+
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-50 text-cyan-700 ring-1 ring-cyan-100">
+          {icon}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const initialFormData: AcademicSessionPayload = {
+  name: '',
+  startDate: '',
+  endDate: '',
+  isActive: false,
+}
 
 export default function AcademicSessionComponent() {
   const queryClient = useQueryClient()
 
   const [search, setSearch] = useState('')
   const [showForm, setShowForm] = useState(false)
-
   const [editingSession, setEditingSession] = useState<AcademicSession | null>(
     null,
   )
+  const [formData, setFormData] =
+    useState<AcademicSessionPayload>(initialFormData)
 
-  const [formData, setFormData] = useState({
-    name: '',
-    start_date: '',
-    end_date: '',
-    is_active: false,
-  })
-
-  const { data = [], isLoading } = useQuery({
+  const {
+    data: sessions = [],
+    isLoading,
+    error: queryError,
+  } = useQuery<AcademicSession[]>({
     queryKey: ['academic-sessions'],
-
-    queryFn: async () => {
-      const response = await api.get('/academic_sessions')
-
-      return response.data.data as AcademicSession[]
-    },
+    queryFn: academicSessionService.getAll,
   })
+
+  const closeModal = () => {
+    setShowForm(false)
+    setEditingSession(null)
+    setFormData(initialFormData)
+  }
 
   const createMutation = useMutation({
-    mutationFn: async () => {
-      const response = await api.post('/academic_sessions', formData)
-
-      return response.data
-    },
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    mutationFn: (payload: AcademicSessionPayload) =>
+      academicSessionService.create(payload),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ['academic-sessions'],
       })
-
       closeModal()
     },
-
-    onError: (error) => {
-      console.error(error)
+    onError: (mutationError) => {
+      console.error('Create academic session failed:', mutationError)
     },
   })
 
   const updateMutation = useMutation({
-    mutationFn: async () => {
-      const response = await api.put(
-        `/academic_sessions/${editingSession?.id}`,
-        formData,
-      )
-
-      return response.data
-    },
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: number
+      payload: AcademicSessionPayload
+    }) => academicSessionService.update(id, payload),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ['academic-sessions'],
       })
-
       closeModal()
     },
-
-    onError: (error) => {
-      console.error(error)
+    onError: (mutationError) => {
+      console.error('Update academic session failed:', mutationError)
     },
   })
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await api.delete(`/academic_sessions/${id}`)
-    },
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => academicSessionService.delete(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ['academic-sessions'],
       })
+    },
+    onError: (mutationError) => {
+      console.error('Delete academic session failed:', mutationError)
     },
   })
 
   const activateMutation = useMutation({
-    mutationFn: async (id: number) => {
-      await api.patch(`/academic_sessions/${id}/activate`)
-    },
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    mutationFn: (id: number) => academicSessionService.activate(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: ['academic-sessions'],
       })
+    },
+    onError: (mutationError) => {
+      console.error('Activate academic session failed:', mutationError)
     },
   })
 
   const filteredSessions = useMemo(() => {
-    return data.filter((session) =>
-      session.name.toLowerCase().includes(search.toLowerCase()),
+    const q = search.toLowerCase().trim()
+
+    if (!q) return sessions
+
+    return sessions.filter((session) =>
+      [
+        session.name,
+        session.startDate,
+        session.endDate,
+        session.isActive ? 'active' : 'inactive',
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(q)),
     )
-  }, [data, search])
+  }, [sessions, search])
+
+  const totalSessions = sessions.length
+  const totalActiveSessions = sessions.filter((s) => s.isActive).length
+  const totalInactiveSessions = sessions.filter((s) => !s.isActive).length
 
   const openCreateModal = () => {
     setEditingSession(null)
-
-    setFormData({
-      name: '',
-      start_date: '',
-      end_date: '',
-      is_active: false,
-    })
-
+    setFormData(initialFormData)
     setShowForm(true)
   }
 
   const openEditModal = (session: AcademicSession) => {
     setEditingSession(session)
-
     setFormData({
-      name: session.name,
-      start_date: session.start_date,
-      end_date: session.end_date,
-      is_active: session.is_active,
+      name: session.name ?? '',
+      startDate: session.startDate ?? '',
+      endDate: session.endDate ?? '',
+      isActive: !!session.isActive,
     })
-
     setShowForm(true)
   }
-  const closeModal = () => {
-    setShowForm(false)
 
-    setEditingSession(null)
-
-    setFormData({
-      name: '',
-      start_date: '',
-      end_date: '',
-      is_active: false,
-    })
-  }
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -164,11 +185,14 @@ export default function AcademicSessionComponent() {
     e.preventDefault()
 
     if (editingSession) {
-      updateMutation.mutate()
+      updateMutation.mutate({
+        id: editingSession.id,
+        payload: formData,
+      })
       return
     }
 
-    createMutation.mutate()
+    createMutation.mutate(formData)
   }
 
   return (
@@ -176,34 +200,32 @@ export default function AcademicSessionComponent() {
       <AcademicSessionHeader onAddSession={openCreateModal} />
 
       <div className="grid gap-5 md:grid-cols-3">
-        <div className="rounded-3xl bg-white p-6 shadow-sm">
-          <h4 className="text-sm text-slate-500">Total Sessions</h4>
-
-          <h2 className="mt-2 text-3xl font-bold">{data.length}</h2>
-        </div>
-
-        <div className="rounded-3xl bg-white p-6 shadow-sm">
-          <h4 className="text-sm text-slate-500">Active Sessions</h4>
-
-          <h2 className="mt-2 text-3xl font-bold">
-            {data.filter((s) => s.is_active).length}
-          </h2>
-        </div>
-
-        <div className="rounded-3xl bg-white p-6 shadow-sm">
-          <h4 className="text-sm text-slate-500">Inactive Sessions</h4>
-
-          <h2 className="mt-2 text-3xl font-bold">
-            {data.filter((s) => !s.is_active).length}
-          </h2>
-        </div>
+        <StatCard
+          title="Total Sessions"
+          value={totalSessions}
+          icon={<FiUsers className="h-5 w-5" />}
+        />
+        <StatCard
+          title="Active Sessions"
+          value={totalActiveSessions}
+          icon={<FiBookOpen className="h-5 w-5" />}
+        />
+        <StatCard
+          title="Inactive Sessions"
+          value={totalInactiveSessions}
+          icon={<FiSearch className="h-5 w-5" />}
+        />
       </div>
 
       <AcademicSessionFilters search={search} setSearch={setSearch} />
 
       {isLoading ? (
-        <div className="rounded-3xl bg-white p-10 text-center">
-          Loading Sessions...
+        <div className="rounded-3xl bg-white p-10 text-center text-slate-500 shadow-sm">
+          Loading sessions...
+        </div>
+      ) : queryError ? (
+        <div className="rounded-3xl bg-white p-10 text-center text-rose-600 shadow-sm">
+          Failed to load sessions.
         </div>
       ) : (
         <AcademicSessionTable
